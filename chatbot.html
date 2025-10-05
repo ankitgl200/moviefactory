@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Chat Support - Movie Factory</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin:0; background:#181818; color:#f5f5f5; }
+    header { background:#222; padding:18px 0; text-align:center; }
+    header h1 { margin:0; color:#ff9800; font-size:2.2rem; letter-spacing:2px }
+    nav { margin-top:8px }
+    nav a { color:#f5f5f5; text-decoration:none; margin:0 12px; font-weight:500 }
+    nav a.highlight { color:#ffb74d; font-weight:700 }
+
+    .container { max-width:900px; margin:40px auto; background:#232323; padding:30px 40px; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,.3); display:flex; align-items:center; justify-content:center; min-height:50vh }
+    .hero { text-align:center }
+    .hero h1 { color:#ff9800; margin-bottom:8px; font-size:2rem }
+    .hero p { color:#dcdcdc; max-width:720px; margin:0 auto }
+
+    /* Chat UI */
+    .chat-container { position:fixed; left:20px; bottom:20px; z-index:1000 }
+    .chat-button { width:64px; height:64px; border-radius:50%; border:none; cursor:pointer; background:linear-gradient(135deg,#ff9800,#ffb74d); box-shadow:0 6px 20px rgba(0,0,0,.35); display:flex; align-items:center; justify-content:center; transition:transform .2s }
+    .chat-button:hover{ transform:scale(1.05) }
+    .chat-button svg{ width:28px; height:28px; fill:#fff }
+
+    .chat-window { position:fixed; left:20px; bottom:100px; width:380px; max-width:calc(100vw - 40px); height:560px; background:#fff; color:#222; border-radius:12px; box-shadow:0 12px 40px rgba(0,0,0,.35); display:none; flex-direction:column; overflow:hidden }
+    .chat-window.active{ display:flex }
+    .chat-header{ background:#111; color:#ff9800; padding:14px 16px; display:flex; align-items:center; justify-content:space-between }
+    .chat-header h3{ margin:0; font-size:16px }
+    .close-btn{ background:none; border:none; color:#ff9800; cursor:pointer }
+    .chat-messages{ flex:1; padding:16px; overflow:auto; background:#f6f6f6 }
+    .message{ margin-bottom:12px }
+    .message-content{ display:inline-block; padding:10px 14px; border-radius:12px; max-width:78% }
+    .message.bot .message-content{ background:#fff }
+    .message.user .message-content{ background:linear-gradient(90deg,#ff9800,#ffb74d); color:#fff }
+
+    .options-container{ display:flex; flex-direction:column; gap:10px; margin-top:8px }
+    .option-btn{ padding:12px 14px; border-radius:8px; border:2px solid #ff9800; background:#fff; color:#ff9800; text-align:left; font-weight:600; cursor:pointer }
+    .option-btn:hover{ background:#ff9800; color:#fff; transform:translateX(6px) }
+    .back-btn{ background:#f0f0f0; border:none; padding:8px 12px; border-radius:8px; cursor:pointer }
+
+    .contact-links{ background:#fff; padding:12px; border-radius:8px; margin-top:10px }
+    .contact-link{ display:block; padding:8px 10px; margin:6px 0; background:#fafafa; color:#ff9800; border-radius:6px; text-decoration:none }
+    .contact-link:hover{ background:#ff9800; color:#fff }
+
+    footer{ background:#222; color:#ccc; text-align:center; padding:18px 0 12px 0; margin-top:40px; font-size:1rem; border-top:1px solid #333 }
+    footer .footer-links{ margin-bottom:8px }
+    footer .footer-links a{ color:#ff9800; text-decoration:none; margin:0 10px; font-weight:500 }
+    footer .footer-links a:hover{ color:#fff }
+
+    @media (max-width:700px){ .container{ margin:20px 12px; padding:18px } .chat-window{ left:10px; right:10px; width:auto } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Movie Factory</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="newmovie.html">Movies</a>
+      <a href="contact.html">Contact</a>
+      <a href="chatbot.html" class="highlight">Chat Support</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Movie Factory Chat Support</h1>
+      <p>Click on the chat icon in the bottom left corner to start chat support. Use the options to request movies or report broken links — we'll guide you to the right contact method.</p>
+    </section>
+  </main>
+
+  <div class="chat-container">
+    <button class="chat-button" onclick="toggleChat()" aria-label="Open chat support">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    </button>
+
+    <div class="chat-window" id="chatWindow" role="dialog" aria-label="Support chat window">
+      <div class="chat-header">
+        <h3>Support Chat</h3>
+        <button class="close-btn" onclick="toggleChat()" aria-label="Close chat">✕</button>
+      </div>
+      <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <script>
+    const chatFlows = {
+      main: {
+        message: 'Hello! How can I help you today? Please select an option below:',
+        options: [
+          { id: 'request_movie', label: 'Request Movie' },
+          { id: 'broken', label: 'Found Broken Link' },
+          { id: 'request_series', label: 'Request Series' },
+          { id: 'contact_us', label: 'Contact Us' }
+        ]
+      },
+
+      request_movie: { message: 'To request a movie please contact us using any of the methods below:', contact: true },
+      request_series: { message: 'To request a series please contact us using any of the methods below:', contact: true },
+      broken: { message: 'Thanks — please report broken links in our Telegram group so we can fix them quickly:', telegram: true },
+      contact_us: { message: 'You will be redirected to the Contact page for more ways to reach us.', redirect: 'contact.html' },
+
+      request: { message: 'I understand you need to request a new movie. Here are some Ways:', options: [ { id: 'tech_login', label: 'Login Issues' }, { id: 'tech_bug', label: 'Report a Bug' }, { id: 'tech_feature', label: 'Feature Not Working' }, { id: 'tech_other', label: 'Other Technical Issue' } ] },
+      billing: { message: 'I can help with billing and payment questions:', options: [ { id: 'bill_invoice', label: 'Invoice Questions' }, { id: 'bill_payment', label: 'Payment Issues' }, { id: 'bill_refund', label: 'Refund Request' }, { id: 'bill_upgrade', label: 'Upgrade/Downgrade' } ] },
+      general: { message: 'What would you like to know?', options: [ { id: 'gen_hours', label: 'Business Hours' }, { id: 'gen_services', label: 'Our Services' }, { id: 'gen_location', label: 'Location & Contact' }, { id: 'gen_other', label: 'Something Else' } ] },
+
+      feedback: { response: 'Thank you for wanting to share your feedback! Your input helps us improve our services.', contact: true },
+      tech_login: { response: 'For login issues, try these steps:\n\n1. Clear your browser cache and cookies\n2. Reset your password using "Forgot Password"\n3. Try a different browser\n\nIf the problem persists, please contact our technical support team.', contact: true },
+      tech_bug: { response: 'Thank you for reporting a bug! To help us fix it quickly, please:\n\n1. Note what you were doing when it occurred\n2. Take a screenshot if possible\n3. Contact our support team with these details', contact: true },
+      tech_feature: { response: 'Sorry you are having trouble with a feature. Our technical team can help you troubleshoot and get everything working smoothly.', contact: true },
+      tech_other: { response: 'Our technical support team is ready to help with any technical issues you\'re experiencing.', contact: true },
+
+      bill_invoice: { response: 'For invoice-related questions:\n\n• Invoices are sent to your registered email\n• You can download past invoices from your account dashboard\n• Invoice disputes should be reported within 30 days\n\nNeed more help? Contact our billing department.', contact: true },
+      bill_payment: { response: 'If you\'re experiencing payment issues:\n\n• Check that your payment method is valid\n• Ensure sufficient funds are available\n• Verify your billing address is correct\n\nOur billing team can assist you further.', contact: true },
+      bill_refund: { response: 'Refund requests are processed according to our refund policy:\n\n• Refunds are available within 30 days of purchase\n• Processing time: 5-10 business days\n• Refunds issued to original payment method\n\nContact our billing team to initiate a refund.', contact: true },
+      bill_upgrade: { response: 'Looking to change your plan?\n\n• Upgrades are effective immediately\n• Downgrades take effect at next billing cycle\n• No charges for plan changes mid-cycle\n\nOur billing team can help you choose the right plan.', contact: true },
+
+      gen_hours: { response: 'Our Business Hours:\n\n📞 Phone Support: Monday-Friday, 9 AM - 6 PM EST\n💬 Live Chat: 24/7\n📧 Email Support: We respond within 24 hours\n\nWe\'re here to help!', contact: true },
+      gen_services: { response: 'We offer a comprehensive range of services:\n\n• Web Development & Design\n• Digital Marketing Solutions\n• Cloud Hosting Services\n• Technical Consulting\n• 24/7 Support\n\nWant to learn more? Get in touch!', contact: true },
+      gen_location: { response: '📍 Our Location:\n\n123 Business Street\nSuite 100\nCity, State 12345\n\n📞 Phone: (555) 123-4567\n📧 Email: support@company.com\n\nFeel free to reach out anytime!', contact: true },
+      gen_other: { response: 'I would be happy to help! For any other questions or concerns, please contact our support team directly. We are here to assist you!', contact: true }
+    };
+
+    let currentStep = 'main';
+    let history = [];
+
+    function toggleChat(){
+      const chatWindow = document.getElementById('chatWindow');
+      chatWindow.classList.toggle('active');
+      if(chatWindow.classList.contains('active') && document.getElementById('chatMessages').children.length === 0){ initChat(); }
+    }
+
+    function initChat(){ currentStep='main'; history=[]; displayMessage(chatFlows.main.message,'bot'); displayOptions(chatFlows.main.options); }
+
+    function displayMessage(text,type){
+      const messagesContainer = document.getElementById('chatMessages');
+      const messageDiv = document.createElement('div'); messageDiv.className = `message ${type}`;
+      const contentDiv = document.createElement('div'); contentDiv.className='message-content'; contentDiv.textContent = text;
+      messageDiv.appendChild(contentDiv); messagesContainer.appendChild(messageDiv); messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function displayOptions(options){
+      const messagesContainer = document.getElementById('chatMessages');
+      const optionsDiv = document.createElement('div'); optionsDiv.className='options-container';
+      options.forEach(option=>{ const btn=document.createElement('button'); btn.className='option-btn'; btn.textContent=option.label; btn.onclick=()=>handleOptionClick(option.id, option.label); optionsDiv.appendChild(btn); });
+      messagesContainer.appendChild(optionsDiv); messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function displayBackButton(){ const messagesContainer=document.getElementById('chatMessages'); const backBtn=document.createElement('button'); backBtn.className='back-btn'; backBtn.innerHTML='← Back to previous menu'; backBtn.onclick=goBack; messagesContainer.appendChild(backBtn); }
+
+    function displayContactLinks(){ const messagesContainer=document.getElementById('chatMessages'); const contactDiv=document.createElement('div'); contactDiv.className='contact-links'; contactDiv.innerHTML=`<h4>Contact Us:</h4><a href="mailto:support@company.com" class="contact-link">📧 Email Support</a><a href="tel:+15551234567" class="contact-link">📞 Call Us: 91+ 884949XXXX</a><a href="#" class="contact-link">💬 Live Chat Support</a>`; messagesContainer.appendChild(contactDiv); messagesContainer.scrollTop=messagesContainer.scrollHeight; }
+
+    function displayTelegramGroup(){ const messagesContainer=document.getElementById('chatMessages'); const telegramDiv=document.createElement('div'); telegramDiv.className='contact-links'; telegramDiv.innerHTML=`<h4>Report Broken Link</h4><p>Please report broken links in our Telegram group so the team can fix them fast.</p><a href="https://t.me/your_telegram_group" target="_blank" rel="noopener" class="contact-link">🔗 Join Telegram Group</a>`; messagesContainer.appendChild(telegramDiv); messagesContainer.scrollTop=messagesContainer.scrollHeight; }
+
+    function displayRedirectLink(href){ const messagesContainer=document.getElementById('chatMessages'); const redirectDiv=document.createElement('div'); redirectDiv.className='contact-links'; redirectDiv.innerHTML=`<h4>Contact Page</h4><p>Click the link below to open our Contact page.</p><a href="${href}" class="contact-link">Go to Contact Page</a>`; messagesContainer.appendChild(redirectDiv); messagesContainer.scrollTop=messagesContainer.scrollHeight; }
+
+    function showTypingIndicator(){ const messagesContainer=document.getElementById('chatMessages'); const typingDiv=document.createElement('div'); typingDiv.className='message bot'; typingDiv.id='typingIndicator'; typingDiv.innerHTML='<div class="typing-indicator"><span></span><span></span><span></span></div>'; messagesContainer.appendChild(typingDiv); messagesContainer.scrollTop=messagesContainer.scrollHeight; }
+
+    function removeTypingIndicator(){ const indicator=document.getElementById('typingIndicator'); if(indicator) indicator.remove(); }
+
+    function handleOptionClick(optionId, optionLabel){
+      const existingOptions=document.querySelectorAll('.options-container, .back-btn, .contact-links'); existingOptions.forEach(el=>el.remove());
+      displayMessage(optionLabel,'user'); showTypingIndicator();
+      setTimeout(()=>{
+        removeTypingIndicator(); if(currentStep!=='main') history.push(currentStep); currentStep=optionId; const flow=chatFlows[optionId];
+        if(flow){ if(flow.message) displayMessage(flow.message,'bot'); if(flow.response) displayMessage(flow.response,'bot'); if(flow.options) displayOptions(flow.options); if(flow.contact) displayContactLinks(); if(flow.telegram) displayTelegramGroup(); if(flow.redirect) displayRedirectLink(flow.redirect); if(currentStep!=='main') displayBackButton(); }
+      },800);
+    }
+
+    function goBack(){ const existingOptions=document.querySelectorAll('.options-container, .back-btn, .contact-links'); existingOptions.forEach(el=>el.remove()); if(history.length>0) currentStep=history.pop(); else currentStep='main'; const flow=chatFlows[currentStep]; if(flow.message) displayMessage(flow.message,'bot'); if(flow.options) displayOptions(flow.options); if(currentStep!=='main' && history.length>0) displayBackButton(); }
+  </script>
+
+  <footer>
+    <div class="footer-links">
+      <a href="index.html">Home</a> |
+      <a href="about.html">About</a> |
+      <a href="newmovie.html">Movies</a> |
+      <a href="contact.html">Contact</a>
+    </div>
+    &copy; 2025 Movie Factory. All rights reserved.
+  </footer>
+</body>
+</html>
