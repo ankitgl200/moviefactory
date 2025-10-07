@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Privacy - Movie Factory</title>
+  <style>
+    :root{ --bg:#181818; --card:#232323; --accent:#ff9800; --muted:#d0d0d0 }
+    body{ margin:0; font-family: 'Segoe UI', Arial, sans-serif; background:var(--bg); color:#f5f5f5 }
+    header{ background:#111; padding:18px 0; text-align:center }
+    header h1{ margin:0; color:var(--accent); font-size:2rem }
+    nav{ margin-top:8px }
+    nav a{ color:#f5f5f5; text-decoration:none; margin:0 10px }
+
+    .container{ max-width:1000px; margin:48px auto; padding:28px; display:flex; gap:28px; align-items:flex-start }
+    .left{ flex:1 }
+    .right{ width:320px }
+
+    .hero-card{ background:linear-gradient(180deg, rgba(255,152,0,0.06), transparent); border:1px solid rgba(255,152,0,0.08); padding:28px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.5) }
+    .hero-card h2{ color:var(--accent); margin:0 0 8px }
+    .hero-card p{ color:var(--muted); margin:0 }
+
+    .notice{ margin-top:20px; padding:20px; background:var(--card); border-radius:10px; border:1px solid rgba(255,255,255,0.03); animation: float 6s ease-in-out infinite }
+    .notice h3{ margin:0 0 8px; color:var(--accent) }
+    .notice p{ color:#ddd; line-height:1.6 }
+
+    .ghost{ margin-top:18px; padding:14px; border-radius:8px; background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); color:var(--muted); font-size:0.95rem }
+
+    .download-box{ background:linear-gradient(90deg,#ffb74d22,#ff980022); border-radius:10px; padding:14px; margin-top:18px; display:flex; justify-content:space-between; align-items:center }
+    .download-box a{ color:#111; background:#ffebcd; padding:8px 12px; border-radius:8px; text-decoration:none; font-weight:700 }
+
+    aside .card{ background:var(--card); padding:18px; border-radius:10px; box-shadow:0 8px 30px rgba(0,0,0,0.5) }
+    aside h4{ color:var(--accent); margin-top:0 }
+
+    footer{ background:#111; color:#bdbdbd; text-align:center; padding:18px 0; margin-top:48px }
+
+    @keyframes float{ 0%{ transform:translateY(0) } 50%{ transform:translateY(-6px) } 100%{ transform:translateY(0) } }
+
+    @media (max-width:880px){ .container{ flex-direction:column; padding:18px } .right{ width:100% } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Movie Factory</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="newmovie.html">Movies</a>
+      <a href="contact.html">Contact</a>
+      <a href="chatbot.html">Chat Support</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="left">
+      <div class="hero-card">
+        <h2>Privacy Policy (Coming Soon)</h2>
+        <p>We're working on our full privacy policy page. For now, here's a short note on how we handle basic information.</p>
+      </div>
+
+      <div class="notice">
+        <h3>Short notice</h3>
+        <p>
+          Movie Factory is preparing a comprehensive privacy policy that will describe what data we collect, how we use it, and how you can control your information.
+          This documentation will be available on this page soon. Until then, we do not sell your personal data and we only use basic information needed to provide services and improve the site.
+        </p>
+      </div>
+
+      <div class="ghost">
+        We will add our full privacy policies soon. Thank you for your patience and for trusting Movie Factory.
+      </div>
+
+      <div class="download-box">
+        <div style="font-size:0.95rem">Prefer the app? Try our Android APK</div>
+        <a href="moviefactory.apk" download>Download</a>
+      </div>
+    </div>
+
+    <aside class="right">
+      <div class="card">
+        <h4>What we collect</h4>
+        <p style="color:#dcdcdc; font-size:0.95rem">Only minimal data such as cookies for session and preferences. No payment or personal identification data is stored without consent.</p>
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.04);margin:12px 0">
+        <h4>Contact</h4>
+        <p style="color:#dcdcdc; font-size:0.95rem">Need immediate help? Visit the <a href="contact.html" style="color:var(--accent);text-decoration:none">Contact page</a> or open Chat Support.</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <div class="footer-links"><a href="index.html">Home</a> | <a href="about.html">About</a> | <a href="contact.html">Contact</a></div>
+    <div style="margin-top:6px">Thank you for visiting Movie Factory.</div>
+  </footer>
+</body>
+</html>
