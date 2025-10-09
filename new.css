@@ -39,9 +39,10 @@
 .navbar-links {
     list-style: none;
     display: flex;
-    gap: 2rem;
+    gap: 9rem;
     margin: 0;
     padding: 0;
+    
 }
 
 .navbar-links li a {
@@ -85,6 +86,10 @@
 }
 
 /* Responsive styles */
+
+
+
+
 @media (max-width: 768px) {
     .navbar {
         flex-wrap: wrap;
@@ -120,9 +125,11 @@
     }
     .navbar-links li a {
         display: block;
+        margin: 15px;
         padding: 1rem 0;
         font-size: 1.1rem;
-        border-radius: 0;
+        border-radius: 5px;
+        border: 1px solid white;
     }
 }
 
@@ -404,32 +411,56 @@ body {
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                text-align: center;
-                padding: 2rem;
+            /* Move navbar to bottom like a mobile app bar */
+            .navbar{
+                position:fixed;
+                top:auto;
+                bottom:0;
+                left:0;
+                right:0;
+                height:64px;
+                padding:0;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                background:rgba(20,20,20,0.95);
+                border-top:1px solid rgba(255,255,255,0.04);
+                backdrop-filter: blur(6px);
+                z-index:1000;
             }
 
-            .logo {
-                font-size: 2.5rem;
+            /* Hide desktop-specific items to save space */
+            .navbar-logo, .navbar-toggle{ display:none }
+
+            /* Show links as a horizontal bottom bar */
+            .navbar-links{
+                display:flex !important;
+                flex-direction:row;
+                width:100%;
+                justify-content:space-around;
+                gap:0;
+                margin:0;
+                padding:0;
+                background:transparent;
+                position:static;
+                box-shadow:none;
             }
 
-            .movie-poster {
-                width: 220px;
-                height: 320px;
+            .navbar-links li{ flex:1; text-align:center }
+            .navbar-links li a{
+                display:flex; flex-direction:column; align-items:center; justify-content:center;
+                padding:6px 4px; font-size:13px; color:#fff; text-decoration:none
             }
+            .navbar-links li a:hover{ background: rgba(255,255,255,0.03); color:#ff6b35 }
 
-            .main-content {
-                padding: 2rem;
-            }
+            /* Ensure the content isn't hidden under the bottom bar */
+            body{ padding-top:0; padding-bottom:90px }
 
-            .cards-section {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-
-            .social-links {
-                flex-direction: column;
-                align-items: center;
-            }
+            /* Keep the other responsive adjustments for header and content */
+            .header { flex-direction: column; text-align: center; padding: 1.5rem; }
+            .logo { font-size: 2.5rem; }
+            .movie-poster { width: 220px; height: 320px; }
+            .main-content { padding: 2rem; }
+            .cards-section { grid-template-columns: 1fr; gap: 2rem; }
+            .social-links { flex-direction: column; align-items: center; }
         }
